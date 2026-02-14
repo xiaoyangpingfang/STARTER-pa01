@@ -54,36 +54,41 @@ CardList::Node* CardList::remove(Node* node, const Card& card) {
     
     if (card < node->data) {
         node->left = remove(node->left, card);
-        if (node->left) node->left->parent = node;  // 更新父指针
+        if (node->left) node->left->parent = node;
     }
     else if (card > node->data) {
         node->right = remove(node->right, card);
-        if (node->right) node->right->parent = node;  // 更新父指针
+        if (node->right) node->right->parent = node;
     }
     else {
         // 找到要删除的节点
+        Node* nodeParent = node->parent;
+        
         if (!node->left && !node->right) {
+            // 叶子节点
             delete node;
             return nullptr;
         }
         else if (!node->left) {
+            // 只有右子树
             Node* temp = node->right;
-            temp->parent = node->parent;  // 更新父指针
+            temp->parent = nodeParent;
             delete node;
             return temp;
         }
         else if (!node->right) {
+            // 只有左子树
             Node* temp = node->left;
-            temp->parent = node->parent;  // 更新父指针
+            temp->parent = nodeParent;
             delete node;
             return temp;
         }
         else {
-            // 两个子节点都存在
+            // 两个子节点都存在 - 用右子树最小值替换
             Node* minNode = findMin(node->right);
             node->data = minNode->data;
             node->right = remove(node->right, minNode->data);
-            if (node->right) node->right->parent = node;  // 更新父指针
+            if (node->right) node->right->parent = node;
         }
     }
     return node;

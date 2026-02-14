@@ -15,7 +15,10 @@ int main(int argc, char** argv) {
     }
     CardList alice, bob;
     ifstream file1(argv[1]), file2(argv[2]);
-    if (!file1 || !file2) { cout << "Could not open files\n"; return 1; }
+    if (!file1 || !file2) { 
+        cout << "Could not open files\n"; 
+        return 1; 
+    }
     
     string line;
     while (getline(file1, line)) {
@@ -36,39 +39,43 @@ int main(int argc, char** argv) {
     file2.close();
 
     while (true) {
-        bool aliceMatched = false;
-        // Alice turn - 先保存匹配的卡片
-        Card matchedCard('c', "a"); // 临时初始化
+        // Alice's turn
+        bool aliceFound = false;
+        Card toRemove;
+        
         for (auto it = alice.begin(); it != alice.end(); ++it) {
             if (bob.contains(*it)) {
-                matchedCard = *it;  // 保存卡片副本
-                aliceMatched = true;
+                toRemove = *it;  // 复制卡片数据
+                aliceFound = true;
                 break;
             }
         }
-        if (aliceMatched) {
-            cout << "Alice picked matching card " << matchedCard << endl;
-            bob.remove(matchedCard);    // 使用副本删除
-            alice.remove(matchedCard);  // 使用副本删除
+        
+        if (aliceFound) {
+            cout << "Alice picked matching card " << toRemove << endl;
+            alice.remove(toRemove);
+            bob.remove(toRemove);
         } else {
-            break;
+            break;  // 没找到，游戏结束
         }
 
-        bool bobMatched = false;
-        // Bob turn - 先保存匹配的卡片
+        // Bob's turn
+        bool bobFound = false;
+        
         for (auto it = bob.rbegin(); it != bob.rend(); ++it) {
             if (alice.contains(*it)) {
-                matchedCard = *it;  // 保存卡片副本
-                bobMatched = true;
+                toRemove = *it;  // 复制卡片数据
+                bobFound = true;
                 break;
             }
         }
-        if (bobMatched) {
-            cout << "Bob picked matching card " << matchedCard << endl;
-            alice.remove(matchedCard);  // 使用副本删除
-            bob.remove(matchedCard);    // 使用副本删除
+        
+        if (bobFound) {
+            cout << "Bob picked matching card " << toRemove << endl;
+            alice.remove(toRemove);
+            bob.remove(toRemove);
         } else {
-            break;
+            break;  // 没找到，游戏结束
         }
     }
 
