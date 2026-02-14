@@ -51,16 +51,39 @@ void CardList::remove(const Card& card) { root = remove(root, card); }
 
 CardList::Node* CardList::remove(Node* node, const Card& card) {
     if (!node) return nullptr;
-    if (card < node->data) node->left = remove(node->left, card);
-    else if (card > node->data) node->right = remove(node->right, card);
+    
+    if (card < node->data) {
+        node->left = remove(node->left, card);
+        if (node->left) node->left->parent = node;  // 更新父指针
+    }
+    else if (card > node->data) {
+        node->right = remove(node->right, card);
+        if (node->right) node->right->parent = node;  // 更新父指针
+    }
     else {
-        if (!node->left && !node->right) { delete node; return nullptr; }
-        else if (!node->left) { Node* temp = node->right; delete node; return temp; }
-        else if (!node->right) { Node* temp = node->left; delete node; return temp; }
+        // 找到要删除的节点
+        if (!node->left && !node->right) {
+            delete node;
+            return nullptr;
+        }
+        else if (!node->left) {
+            Node* temp = node->right;
+            temp->parent = node->parent;  // 更新父指针
+            delete node;
+            return temp;
+        }
+        else if (!node->right) {
+            Node* temp = node->left;
+            temp->parent = node->parent;  // 更新父指针
+            delete node;
+            return temp;
+        }
         else {
+            // 两个子节点都存在
             Node* minNode = findMin(node->right);
             node->data = minNode->data;
             node->right = remove(node->right, minNode->data);
+            if (node->right) node->right->parent = node;  // 更新父指针
         }
     }
     return node;
