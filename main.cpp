@@ -1,40 +1,76 @@
-// This file should implement the game using a custom implementation of a BST (based on your earlier BST implementation)
+//main.cpp
+//Author:Xiaoyang Zhang
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <sstream>
 #include "card.h"
 #include "card_list.h"
-//Do not include set in this file
 
 using namespace std;
 
-int main(int argv, char** argc){
-  if(argv < 3){
-    cout << "Please provide 2 file names" << endl;
-    return 1;
-  }
-  
-  ifstream cardFile1 (argc[1]);
-  ifstream cardFile2 (argc[2]);
-  string line;
+int main(int argc, char** argv) {
+    if(argc < 3){
+        cout << "Please provide 2 file names" << endl;
+        return 1;
+    }
 
-  if (cardFile1.fail() || cardFile2.fail() ){
-    cout << "Could not open file " << argc[2];
-    return 1;
-  }
+    CardList alice, bob;
 
-  //Read each file
-  while (getline (cardFile1, line) && (line.length() > 0)){
+    ifstream file1(argv[1]), file2(argv[2]);
+    if (!file1 || !file2) { cout << "Could not open files\n"; return 1; }
 
-  }
-  cardFile1.close();
+    string line;
+    while (getline(file1, line)) {
+        if (line.empty()) continue;
+        stringstream ss(line);
+        char suit; string value;
+        ss >> suit >> value;
+        alice.insert(Card(suit, value));
+    }
 
+    while (getline(file2, line)) {
+        if (line.empty()) continue;
+        stringstream ss(line);
+        char suit; string value;
+        ss >> suit >> value;
+        bob.insert(Card(suit, value));
+    }
 
-  while (getline (cardFile2, line) && (line.length() > 0)){
+    file1.close();
+    file2.close();
 
-  }
-  cardFile2.close();
-  
-  
-  return 0;
+    while (true) {
+        bool aliceMatched = false;
+        for (auto it = alice.begin(); it != alice.end(); ++it) {
+            if (bob.contains(*it)) {
+                cout << "Alice picked matching card " << *it << endl;
+                bob.remove(*it);
+                alice.remove(*it);
+                aliceMatched = true;
+                break;
+            }
+        }
+        if (!aliceMatched) break;
+
+        bool bobMatched = false;
+        for (auto it = bob.rbegin(); it != bob.rend(); ++it) {
+            if (alice.contains(*it)) {
+                cout << "Bob picked matching card " << *it << endl;
+                alice.remove(*it);
+                bob.remove(*it);
+                bobMatched = true;
+                break;
+            }
+        }
+        if (!bobMatched) break;
+    }
+
+    cout << "\nAlice's cards:" << endl;
+    alice.printInOrder();
+    cout << "\nBob's cards:" << endl;
+    bob.printInOrder();
+
+    return 0;
 }
+
