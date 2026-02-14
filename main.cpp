@@ -60,18 +60,14 @@ int main(int argc, char** argv) {
         bob.remove(toRemove);
 
         // Bob's turn - reverse iteration
+        // Bob's turn - 现在可以用标准的 ++it 了！
         bool bobFound = false;
         
-        if (!bob.isEmpty()) {
-            auto it = bob.rbegin();
-            
-            while (it != bob.rend()) {
-                if (alice.contains(*it)) {
-                    toRemove = *it;
-                    bobFound = true;
-                    break;
-                }
-                --it;
+        for (auto it = bob.rbegin(); it != bob.rend(); ++it) {  // ? 标准写法
+            if (alice.contains(*it)) {
+                toRemove = *it;
+                bobFound = true;
+                break;
             }
         }
         

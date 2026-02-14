@@ -164,11 +164,13 @@ CardList::Iterator CardList::begin() const {
 
 CardList::Iterator CardList::end() const { return Iterator(nullptr); }
 
-CardList::Iterator CardList::rbegin() const {
+CardList::ReverseIterator CardList::rbegin() const {
     Node* n = root;
-    if (!n) return Iterator(nullptr);
+    if (!n) return ReverseIterator(nullptr);
     while (n->right) n = n->right;
-    return Iterator(n);
+    return ReverseIterator(n);
 }
 
-CardList::Iterator CardList::rend() const { return Iterator(nullptr); }
+CardList::ReverseIterator CardList::rend() const {
+    return ReverseIterator(nullptr);
+}
