@@ -47,10 +47,9 @@ CardList::Node* CardList::findMax(Node* node) const {
     return node;
 }
 
-// ========== REMOVE FUNCTIONS (只保留这一组) ==========
 void CardList::remove(const Card& card) { 
     root = remove(root, card); 
-    if (root) root->parent = nullptr;  // 确保根节点父指针为空
+    if (root) root->parent = nullptr;
 }
 
 CardList::Node* CardList::remove(Node* node, const Card& card) {
@@ -58,44 +57,38 @@ CardList::Node* CardList::remove(Node* node, const Card& card) {
     
     if (card < node->data) {
         node->left = remove(node->left, card);
-        if (node->left) node->left->parent = node;  // 更新父指针
+        if (node->left) node->left->parent = node;
         return node;
     }
     else if (card > node->data) {
         node->right = remove(node->right, card);
-        if (node->right) node->right->parent = node;  // 更新父指针
+        if (node->right) node->right->parent = node;
         return node;
     }
     else {
-        // 找到要删除的节点
         if (!node->left && !node->right) {
-            // 情况1：叶子节点
             delete node;
             return nullptr;
         }
         else if (!node->left) {
-            // 情况2：只有右子树
             Node* temp = node->right;
             delete node;
             return temp;
         }
         else if (!node->right) {
-            // 情况3：只有左子树
             Node* temp = node->left;
             delete node;
             return temp;
         }
         else {
-            // 情况4：两个子节点都存在
             Node* successor = findMin(node->right);
-            node->data = successor->data;  // 复制数据
-            node->right = remove(node->right, successor->data);  // 递归删除后继
-            if (node->right) node->right->parent = node;  // 更新父指针
+            node->data = successor->data;
+            node->right = remove(node->right, successor->data);
+            if (node->right) node->right->parent = node;
             return node;
         }
     }
 }
-// ========== END REMOVE FUNCTIONS ==========
 
 void CardList::printInOrder() const { printInOrder(root); }
 void CardList::printInOrder(Node* node) const {
@@ -127,33 +120,7 @@ Card CardList::getLargest() const {
 
 bool CardList::isEmpty() const { return root == nullptr; }
 
-// ================== Iterator ==================
-
-CardList::Iterator& CardList::Iterator::operator++() {
-    if (!current) return *this;
-    if (current->right) {
-        current = current->right;
-        while (current->left) current = current->left;
-    } else {
-        Node* p = current->parent;
-        while (p && current == p->right) { current = p; p = p->parent; }
-        current = p;
-    }
-    return *this;
-}
-
-CardList::Iterator& CardList::Iterator::operator--() {
-    if (!current) return *this;
-    if (current->left) {
-        current = current->left;
-        while (current->right) current = current->right;
-    } else {
-        Node* p = current->parent;
-        while (p && current == p->left) { current = p; p = p->parent; }
-        current = p;
-    }
-    return *this;
-}
+// ================== 正向迭代器 ==================
 
 CardList::Iterator CardList::begin() const {
     Node* n = root;
@@ -162,7 +129,11 @@ CardList::Iterator CardList::begin() const {
     return Iterator(n);
 }
 
-CardList::Iterator CardList::end() const { return Iterator(nullptr); }
+CardList::Iterator CardList::end() const { 
+    return Iterator(nullptr); 
+}
+
+// ================== 反向迭代器 ==================
 
 CardList::ReverseIterator CardList::rbegin() const {
     Node* n = root;
@@ -171,6 +142,6 @@ CardList::ReverseIterator CardList::rbegin() const {
     return ReverseIterator(n);
 }
 
-CardList::ReverseIterator CardList::rend() const {
-    return ReverseIterator(nullptr);
+CardList::ReverseIterator CardList::rend() const { 
+    return ReverseIterator(nullptr); 
 }

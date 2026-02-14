@@ -59,11 +59,10 @@ int main(int argc, char** argv) {
         alice.remove(toRemove);
         bob.remove(toRemove);
 
-        // Bob's turn - reverse iteration
-        // Bob's turn - 现在可以用标准的 ++it 了！
+        // Bob's turn
         bool bobFound = false;
         
-        for (auto it = bob.rbegin(); it != bob.rend(); ++it) {  // ? 标准写法
+        for (auto it = bob.rbegin(); it != bob.rend(); ++it) {
             if (alice.contains(*it)) {
                 toRemove = *it;
                 bobFound = true;
@@ -80,9 +79,13 @@ int main(int argc, char** argv) {
         bob.remove(toRemove);
     }
 
-    cout << "\nAlice's cards:" << endl;
+    // 注意：这里的输出格式很重要！
+    cout << endl;  // 只有在有匹配时才需要这个空行
+    cout << "Alice's cards:" << endl;
     alice.printInOrder();
-    cout << "\nBob's cards:" << endl;
+    cout << endl;
+    cout << "Bob's cards:" << endl;
     bob.printInOrder();
     return 0;
 }
+
