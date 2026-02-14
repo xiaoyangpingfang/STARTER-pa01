@@ -1,74 +1,93 @@
-//main.cpp
-//Author:Xiaoyang Zhang
+// main.cpp
+// Author: Xiaoyang Zhang
 #include <iostream>
 #include <fstream>
-#include <string>
 #include <sstream>
+#include <string>
 #include "card.h"
 #include "card_list.h"
 
 using namespace std;
 
 int main(int argc, char** argv) {
-    if(argc < 3){
+    if (argc < 3) {
         cout << "Please provide 2 file names" << endl;
         return 1;
     }
 
-    CardList alice, bob;
+    CardList alice;
+    CardList bob;
 
-    ifstream file1(argv[1]), file2(argv[2]);
-    if (!file1 || !file2) { cout << "Could not open files\n"; return 1; }
+    ifstream cardFile1(argv[1]);
+    ifstream cardFile2(argv[2]);
 
+    if (cardFile1.fail() || cardFile2.fail()) {
+        cout << "Could not open file(s)" << endl;
+        return 1;
+    }
+
+    // Read Alice's cards
     string line;
-    while (getline(file1, line)) {
+    while (getline(cardFile1, line)) {
         if (line.empty()) continue;
         stringstream ss(line);
-        char suit; string value;
+        char suit;
+        string value;
         ss >> suit >> value;
         alice.insert(Card(suit, value));
     }
+    cardFile1.close();
 
-    while (getline(file2, line)) {
+    // Read Bob's cards
+    while (getline(cardFile2, line)) {
         if (line.empty()) continue;
         stringstream ss(line);
-        char suit; string value;
+        char suit;
+        string value;
         ss >> suit >> value;
         bob.insert(Card(suit, value));
     }
+    cardFile2.close();
 
-    file1.close();
-    file2.close();
+    // Game loop: Alice (smallest) -> Bob (largest)
+    bool foundMatch = true;
+    while (foundMatch) {
+        foundMatch = false;
 
-    while (true) {
-        bool aliceMatched = false;
-        for (auto it = alice.begin(); it != alice.end(); ++it) {
-            if (bob.contains(*it)) {
-                cout << "Alice picked matching card " << *it << endl;
-                bob.remove(*it);
-                alice.remove(*it);
-                aliceMatched = true;
-                break;
+        // Alice's turn: pick smallest matching card
+        if (!alice.isEmpty()) {
+            Card smallest = alice.getSmallest();
+            if (bob.contains(smallest)) {
+                cout << "Alice picked matching card " << smallest << endl;
+                alice.remove(smallest);
+                bob.remove(smallest);
+                foundMatch = true;
             }
         }
-        if (!aliceMatched) break;
 
-        bool bobMatched = false;
-        for (auto it = bob.rbegin(); it != bob.rend(); ++it) {
-            if (alice.contains(*it)) {
-                cout << "Bob picked matching card " << *it << endl;
-                alice.remove(*it);
-                bob.remove(*it);
-                bobMatched = true;
-                break;
+        if (!foundMatch) break; // No match, end game
+
+        foundMatch = false;
+
+        // Bob's turn: pick largest matching card
+        if (!bob.isEmpty()) {
+            Card largest = bob.getLargest();
+            if (alice.contains(largest)) {
+                cout << "Bob picked matching card " << largest << endl;
+                bob.remove(largest);
+                alice.remove(largest);
+                foundMatch = true;
             }
         }
-        if (!bobMatched) break;
     }
 
-    cout << "\nAlice's cards:" << endl;
+    // Print final cards
+    cout << endl;
+    cout << "Alice's cards:" << endl;
     alice.printInOrder();
-    cout << "\nBob's cards:" << endl;
+
+    cout << endl;
+    cout << "Bob's cards:" << endl;
     bob.printInOrder();
 
     return 0;
