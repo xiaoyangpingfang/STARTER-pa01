@@ -45,38 +45,43 @@ int main(int argc, char** argv) {
         
         for (auto it = alice.begin(); it != alice.end(); ++it) {
             if (bob.contains(*it)) {
-                toRemove = *it;  // 复制卡片数据
+                toRemove = *it;
                 aliceFound = true;
                 break;
             }
         }
         
-        if (aliceFound) {
-            cout << "Alice picked matching card " << toRemove << endl;
-            alice.remove(toRemove);
-            bob.remove(toRemove);
-        } else {
-            break;  // 没找到，游戏结束
+        if (!aliceFound) {
+            break;
         }
+        
+        cout << "Alice picked matching card " << toRemove << endl;
+        alice.remove(toRemove);
+        bob.remove(toRemove);
 
-        // Bob's turn
+        // Bob's turn - reverse iteration
         bool bobFound = false;
         
-        for (auto it = bob.rbegin(); it != bob.rend(); ++it) {
-            if (alice.contains(*it)) {
-                toRemove = *it;  // 复制卡片数据
-                bobFound = true;
-                break;
+        if (!bob.isEmpty()) {
+            auto it = bob.rbegin();
+            
+            while (it != bob.rend()) {
+                if (alice.contains(*it)) {
+                    toRemove = *it;
+                    bobFound = true;
+                    break;
+                }
+                --it;
             }
         }
         
-        if (bobFound) {
-            cout << "Bob picked matching card " << toRemove << endl;
-            alice.remove(toRemove);
-            bob.remove(toRemove);
-        } else {
-            break;  // 没找到，游戏结束
+        if (!bobFound) {
+            break;
         }
+        
+        cout << "Bob picked matching card " << toRemove << endl;
+        alice.remove(toRemove);
+        bob.remove(toRemove);
     }
 
     cout << "\nAlice's cards:" << endl;

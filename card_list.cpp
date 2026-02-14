@@ -47,52 +47,55 @@ CardList::Node* CardList::findMax(Node* node) const {
     return node;
 }
 
-void CardList::remove(const Card& card) { root = remove(root, card); }
+// ========== REMOVE FUNCTIONS (只保留这一组) ==========
+void CardList::remove(const Card& card) { 
+    root = remove(root, card); 
+    if (root) root->parent = nullptr;  // 确保根节点父指针为空
+}
 
 CardList::Node* CardList::remove(Node* node, const Card& card) {
     if (!node) return nullptr;
     
     if (card < node->data) {
         node->left = remove(node->left, card);
-        if (node->left) node->left->parent = node;
+        if (node->left) node->left->parent = node;  // 更新父指针
+        return node;
     }
     else if (card > node->data) {
         node->right = remove(node->right, card);
-        if (node->right) node->right->parent = node;
+        if (node->right) node->right->parent = node;  // 更新父指针
+        return node;
     }
     else {
         // 找到要删除的节点
-        Node* nodeParent = node->parent;
-        
         if (!node->left && !node->right) {
-            // 叶子节点
+            // 情况1：叶子节点
             delete node;
             return nullptr;
         }
         else if (!node->left) {
-            // 只有右子树
+            // 情况2：只有右子树
             Node* temp = node->right;
-            temp->parent = nodeParent;
             delete node;
             return temp;
         }
         else if (!node->right) {
-            // 只有左子树
+            // 情况3：只有左子树
             Node* temp = node->left;
-            temp->parent = nodeParent;
             delete node;
             return temp;
         }
         else {
-            // 两个子节点都存在 - 用右子树最小值替换
-            Node* minNode = findMin(node->right);
-            node->data = minNode->data;
-            node->right = remove(node->right, minNode->data);
-            if (node->right) node->right->parent = node;
+            // 情况4：两个子节点都存在
+            Node* successor = findMin(node->right);
+            node->data = successor->data;  // 复制数据
+            node->right = remove(node->right, successor->data);  // 递归删除后继
+            if (node->right) node->right->parent = node;  // 更新父指针
+            return node;
         }
     }
-    return node;
 }
+// ========== END REMOVE FUNCTIONS ==========
 
 void CardList::printInOrder() const { printInOrder(root); }
 void CardList::printInOrder(Node* node) const {
@@ -169,4 +172,3 @@ CardList::Iterator CardList::rbegin() const {
 }
 
 CardList::Iterator CardList::rend() const { return Iterator(nullptr); }
-

@@ -27,6 +27,7 @@ private:
     void printInOrder(Node* node) const;
     void printReverse(Node* node) const;
     void destroy(Node* node);
+    void validateHelper(Node* node, Node* expectedParent) const;
 
 public:
     CardList();
@@ -40,7 +41,7 @@ public:
     Card getSmallest() const;
     Card getLargest() const;
     bool isEmpty() const;
-
+	void validate() const;  // 声明
     class Iterator {
     private:
         Node* current;
